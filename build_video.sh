@@ -52,7 +52,7 @@ fi
 MODE=${1:-0}
 
 INPUT_DIR="podcast_wavs_out"
-OUTPUT_DIR="podcast_videos"
+OUTPUT_DIR="videos"
 prefix="gamer"
 ACTOR="$GAMER"
 PROMPT="She speaks with excitement and enthusiasm as she sits behind the desk with a smile. "
@@ -60,7 +60,6 @@ REF="$GAMER_VOICE"
 
 if [[ "$MODE" -eq 1 ]]; then
     INPUT_DIR="newscast_wavs_out"
-    OUTPUT_DIR="newscast_videos"
     prefix="anchor"
     ACTOR="$ANCHOR"
     PROMPT="She speaks calmly with a neutral pleasing smile. "

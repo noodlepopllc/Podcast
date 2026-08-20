@@ -49,7 +49,7 @@ fi
 
 GAMER_VOICE="media/gamer.wav"
 if [[ ! -f "$GAMER_VOICE" ]]; then
-    uv run dialog -I "young adult, female, high pitch, american accent" -O "$GAMER_VOICE" 
+    uv run dialog -I "young adult, female, high pitch" -O "$GAMER_VOICE" 
 fi
 
 ANCHOR="media/anchor.png"
@@ -59,7 +59,7 @@ fi
 
 ANCHOR_VOICE="media/anchor.wav"
 if [[ ! -f "$ANCHOR_VOICE" ]]; then
-    uv run dialog -I "young adult, female, moderate pitch, british accent" -O "$ANCHOR_VOICE" 
+    uv run dialog -I "young adult, female, moderate pitch" -O "$ANCHOR_VOICE" 
 fi
 SCIENTIST="media/scientist.png"
 if [[ ! -f "$SCIENTIST" ]]; then
@@ -68,7 +68,7 @@ fi
 
 SCIENTIST_VOICE="media/scientist.wav"
 if [[ ! -f "$SCIENTIST_VOICE" ]]; then
-    uv run dialog -I "young adult, female, moderate pitch, australian accent" -O "$SCIENTIST_VOICE" 
+    uv run dialog -I "young adult, female, moderate pitch" -O "$SCIENTIST_VOICE" 
 fi
 
 

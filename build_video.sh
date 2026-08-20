@@ -36,7 +36,7 @@ fi
 
 GAMER_VOICE="media/gamer.wav"
 if [[ ! -f "$GAMER_VOICE" ]]; then
-    uv run dialog -I "young adult, female, high pitch, american accent" -O "$GAMER_VOICE" -L
+    uv run dialog -I "young adult, female, high pitch, american accent" -O "$GAMER_VOICE" 
 fi
 
 ANCHOR="media/anchor.png"
@@ -46,7 +46,7 @@ fi
 
 ANCHOR_VOICE="media/anchor.wav"
 if [[ ! -f "$ANCHOR_VOICE" ]]; then
-    uv run dialog -I "young adult, female, moderate pitch, british accent" -O "$ANCHOR_VOICE" -L
+    uv run dialog -I "young adult, female, moderate pitch, british accent" -O "$ANCHOR_VOICE" 
 fi
 
 MODE=${1:-0}

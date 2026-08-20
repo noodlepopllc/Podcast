@@ -27,6 +27,19 @@ if [[ ! -f current_newscast/worldnews.txt ]]; then
     uv run scripts/combiner.py newscast_wavs newscast_wavs_out
 fi
 
+mkdir -p current_educast
+
+if [[ ! -f current_educast/sciencenews.txt ]]; then
+    rm -f current_educast/*
+    rm -f educast_wavs/*
+    rm -f educast_wavs_out/*
+    uv run scripts/get_news.py -S -O current_educast/sciencenews.txt
+    uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt
+    uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/science_educast.txt
+    uv run scriptreader -s -i current_educast/science_educast.txt -o educast_wavs
+    uv run scripts/combiner.py educast_wavs educast_wavs_out
+fi
+
 mkdir -p media
 
 GAMER="media/gamer.png"
@@ -48,6 +61,17 @@ ANCHOR_VOICE="media/anchor.wav"
 if [[ ! -f "$ANCHOR_VOICE" ]]; then
     uv run dialog -I "young adult, female, moderate pitch, british accent" -O "$ANCHOR_VOICE" 
 fi
+SCIENTIST="media/scientist.png"
+if [[ ! -f "$SCIENTIST" ]]; then
+    uv run image_gen -P "Photorealistic portrait of an attractive adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing black‑rimmed reading glasses, soft natural makeup, a fitted white camisole top, casual modern slacks, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W 720 -H 1280
+fi
+
+SCIENTIST_VOICE="media/scientist.wav"
+if [[ ! -f "$SCIENTIST_VOICE" ]]; then
+    uv run dialog -I "young adult, female, moderate pitch, australian accent" -O "$SCIENTIST_VOICE" 
+fi
+
+
 
 MODE=${1:-0}
 
@@ -66,6 +90,15 @@ if [[ "$MODE" -eq 1 ]]; then
     REF="$ANCHOR_VOICE"
 fi
 
+if [[ "$MODE" -eq 2 ]]; then
+    INPUT_DIR="educast_wavs_out"
+    prefix="scientist"
+    ACTOR="$SCIENTIST"
+    PROMPT="She speaks with enthusiasm and a subtle smile. "
+    REF="$SCIENTIST_VOICE"
+fi
+
+
 mkdir -p "$OUTPUT_DIR"
 
 for wav in "$INPUT_DIR"/clip_*.wav; do
@@ -82,7 +115,7 @@ for wav in "$INPUT_DIR"/clip_*.wav; do
 
     echo "Processing $wav -> $out"
 
-    transcript="$OUTPUT_DIR/clip${num}.txt"
+    transcript="$OUTPUT_DIR/${prefix}${num}.txt"
 
     uv run dialog -R "$wav" -S -O "$transcript"
 

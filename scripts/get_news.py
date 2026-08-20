@@ -17,6 +17,13 @@ XBOX_NEWS_FEEDS = [
     "https://gamerant.com/feed/tag/xbox"
 ]
 
+SCI_TECH_FEEDS = [
+    "https://www.pbs.org/newshour/feeds/rss/science",
+    "https://www.esa.int/rssfeed/Our_Activities/Observing_the_Earth",
+    "https://feeds.npr.org/1007/rss.xml",
+    "https://www.sciencedaily.com/rss/top/science.xml"
+]
+
 def limit_per_source(items, per_source=3):
     limited = []
     by_source = {}
@@ -30,6 +37,25 @@ def limit_per_source(items, per_source=3):
         limited.extend(group_sorted[:per_source])
 
     return limited
+
+def limit_diverse_top_n(items, n):
+    # Step 1: group items by source
+    by_source = {}
+    for item in items:
+        src = item["source"]
+        by_source.setdefault(src, []).append(item)
+
+    # Step 2: take newest item from each source
+    newest_per_source = []
+    for src, group in by_source.items():
+        group_sorted = sorted(group, key=lambda x: x["published"], reverse=True)
+        newest_per_source.append(group_sorted[0])
+
+    # Step 3: sort those by date
+    sorted_newest = sorted(newest_per_source, key=lambda x: x["published"], reverse=True)
+
+    # Step 4: return top n
+    return sorted_newest[:n]
 
 
 def parse_timestamp(entry):
@@ -72,12 +98,22 @@ def filter_recent(items, hours=24):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('-G', '--gaming', action='store_true', help='Set to gaming news, defaults to world news')
+    parser.add_argument('-S', '--science', action='store_true', help='Set to science and technology')
+    parser.add_argument('-G', '--gaming', action='store_true', help='Set to gaming news')
     parser.add_argument('-O', '--output', type=str, default='today.txt')
     args = parser.parse_args()
-    items = fetch_items(XBOX_NEWS_FEEDS if args.gaming else WORLD_NEWS_FEEDS)
+    if args.science:
+        topic = SCI_TECH_FEEDS
+        prompt = 'prompts/science.txt'
+    elif args.gaming:
+        topic = XBOX_NEWS_FEEDS
+        prompt = 'prompts/gamer.txt'
+    else:
+        topic = WORLD_NEWS_FEEDS
+        prompt = 'prompts/news.txt'
+    items = fetch_items(topic)
     recent = filter_recent(items)
-    limited = limit_per_source(recent, per_source=3)
+    limited = limit_diverse_top_n(recent,3)
 
     for i, item in enumerate(limited, 1):
         item["id"] = i
@@ -85,7 +121,6 @@ def main():
     json_context = json.dumps(limited, indent=2)
 
     from pathlib import Path
-    prompt = 'prompts/gamer.txt' if args.gaming else 'prompts/news.txt'
     template = Path(prompt).read_text().format(json_context=json_context)
     Path(args.output).write_text(template)
     print(template[:125])

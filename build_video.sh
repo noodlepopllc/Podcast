@@ -91,6 +91,10 @@ for wav in "$INPUT_DIR"/clip_*.wav; do
     duration=$((duration + 1))
     text=$(cut -d'|' -f2 "$transcript")
 
+    #wav="$OUTPUT_DIR/clip${num}.wav"
+    
+    #uv run dialog -R "$REF" -T "$text" -D $duration -O $wav
+
     uv run speech_to_video \
         -A "$REF" \
         -T "$text" \

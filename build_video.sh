@@ -41,7 +41,7 @@ fi
 
 ANCHOR="media/anchor.png"
 if [[ ! -f "$ANCHOR" ]]; then
-    uv run image_gen -P "Photorealistic portrait of a beautiful adult female east indian newscaster sitting in front of a news desk, long wavy black hair, realistic hair strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft balanced studio lighting, professional news setup." -O "$ANCHOR" -W 720 -H 1280
+    uv run image_gen -P "Photorealistic portrait of a beautiful adult female East Indian newscaster sitting at a spacious news desk, warm confident smile, engaged expression with slightly raised eyebrows, subtle forward‑leaning posture, long wavy black hair with realistic strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft warm studio lighting with gentle highlights, wider professional news studio environment, open composition." -O "$ANCHOR" -W 720 -H 1280
 fi
 
 ANCHOR_VOICE="media/anchor.wav"
@@ -96,7 +96,7 @@ for wav in "$INPUT_DIR"/clip_*.wav; do
 
     uv run speech_to_video \
         -A "$REF" \
-        -T "$text" \
+        -T "Start. $text Stop." \
         -P "$PROMPT" \
         -I "$ACTOR" \
         -D "$duration" \

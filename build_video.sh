@@ -129,7 +129,7 @@ for wav in "$INPUT_DIR"/clip_*.wav; do
 
     uv run speech_to_video \
         -A "$REF" \
-        -T "Start. $text Stop." \
+        -T "$text Stop." \
         -P "$PROMPT" \
         -I "$ACTOR" \
         -D "$duration" \

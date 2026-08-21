@@ -4,7 +4,7 @@ from json import dump, load
 import soundfile as sf
 import numpy as np
 from spacy_download import load_spacy
-from plan10.lib.dialog import CloneVoice
+from plan10.lib.dialog import CloneVoice, DialogSession
 
 # uv run spacy download en_core_web_sm
 
@@ -91,9 +91,9 @@ class Voice(object):
         return []
 
 
-    def create_wav(self, text, path='tmp2.wav', key=''):
+    def create_wav(self, text, path='tmp2.wav', key='', session=None):
         voice = self.config[key]['voice']
-        CloneVoice(text, voice, path, 15.0, lengthen=False)
+        CloneVoice(text, voice, path, 15.0, lengthen=False, session=session)
         return round(librosa.get_duration(path=path),2)
 
     def run(self, script):
@@ -106,16 +106,17 @@ class Voice(object):
 
         Path(self.output).mkdir(parents=True, exist_ok=True)
 
-        for idx in range(len(outp),len(inp)):
-            key = [x for x in inp[idx].keys()][0]
-            if key not in self.config:
-                key = 'alex'
-            text = inp[idx][key]
-            voice = self.config[key]
-            p = f'{self.output}/{prefix}_{idx:03}_{key}.wav'
-            inp[idx]['path'] = p
-            inp[idx]['duration'] = self.create_wav(text, p, key)
-            outp.append(inp[idx])
+        with DialogSession() as tts:
+            for idx in range(len(outp),len(inp)):
+                key = [x for x in inp[idx].keys()][0]
+                if key not in self.config:
+                    key = 'alex'
+                text = inp[idx][key]
+                voice = self.config[key]
+                p = f'{self.output}/{prefix}_{idx:03}_{key}.wav'
+                inp[idx]['path'] = p
+                inp[idx]['duration'] = self.create_wav(text, p, key, tts)
+                outp.append(inp[idx])
         with open(jsonpath,'w') as outfile:
             dump(outp,outfile,indent=4)
 

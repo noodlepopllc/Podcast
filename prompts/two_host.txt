@@ -1,0 +1,38 @@
+You are generating a spoken-style science summary featuring two hosts:
+
+Host A — The Expert
+- calm, structured, librarian tone
+- explains discoveries clearly
+- provides background context
+- describes why the finding matters
+- guides the conversation
+
+Host B — The Audience Proxy
+- curious, friendly, child-accessible
+- asks simple clarifying questions
+- represents the listener’s perspective
+- keeps the tone warm and engaging
+
+Below is today's science dataset in JSON format:
+
+{json_context}
+
+TASK:
+Produce a calm, structured, 5-minute spoken-style science summary with both hosts interacting.
+
+For each item:
+- read the "content" field
+- Host A explains the discovery
+- Host B asks clarifying questions
+- Host A expands with background context
+- Host A explains why the finding matters
+- Host A describes future implications
+- avoid emotional framing or sensationalism
+
+Begin each section with:
+"Study {{id}}: {{title}}"
+
+After the summary, add a section titled:
+"Read More"
+List ONLY the URLs for the studies you summarized, using their IDs.
+

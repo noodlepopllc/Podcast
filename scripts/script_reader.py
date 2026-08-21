@@ -51,7 +51,7 @@ class Voice(object):
         current_text = []
 
         MIN_WORDS = 10
-        MAX_WORDS = 15
+        MAX_WORDS = 22
 
         for key, seg in raw_segments:
             words = seg.split()

@@ -20,7 +20,7 @@ if [[ "$MODE" -eq 0 ]]; then
     if [[ ! -f current_newscast/worldnews.txt ]]; then
         rm -f current_newscast/*
         rm -f newscast_wavs/*
-        rm -f newscast_wavs_out/*
+        #rm -f newscast_wavs_out/*
         mkdir -p current_newscast
         uv run scripts/get_news.py -O current_newscast/worldnews.txt
         uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
@@ -53,7 +53,7 @@ if [[ "$MODE" -eq 1 ]]; then
     if [[ ! -f current_podcast/gamingnews.txt ]]; then
         rm -f current_podcast/*
         rm -f podcast_wavs/*
-        rm -f podcast_wavs_out/*
+        #rm -f podcast_wavs_out/*
         mkdir -p current_podcast
         uv run scripts/get_news.py -G -O current_podcast/gamingnews.txt
         uv run llm -S current_podcast/gamingnews.txt -M 32786 -P " " -O current_podcast/gamingnews_script.txt
@@ -85,7 +85,7 @@ if [[ "$MODE" -eq 2 ]]; then
     if [[ ! -f current_educast/sciencenews.txt ]]; then
         rm -f current_educast/*
         rm -f educast_wavs/*
-        rm -f educast_wavs_out/*
+        #rm -f educast_wavs_out/*
         mkdir -p current_educast
         uv run scripts/get_news.py -S -O current_educast/sciencenews.txt
         uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt

@@ -21,28 +21,68 @@ class Voice(object):
     def readScript(self, script):
         nlp = load_spacy("en_core_web_sm", exclude=["parser", "tagger"])
         nlp.add_pipe('sentencizer')
-        rscript = []
 
-        with open(script,'r') as infile:
+        # Step 1: read lines and sentence‑split
+        raw_segments = []   # list of (key, text)
+
+        with open(script, 'r') as infile:
             for line in infile:
-                l = line.replace("*","")
-                key =  l.split(':')[0].split(' ')[0].lower().strip()
-                rest = l.split(':')
+                l = line.replace("*", "")
+                key = l.split(':')[0].split(' ')[0].lower().strip()
+                rest = l.split(':', 1)
                 if len(rest) > 1:
-                    rest = rest[1].strip()
-                if len(key) > 0:
-                    text = rest
-                    print(text)
-                    if self.segment:
-                        doc = nlp(text)
-                        for x in doc.sents:
-                            tmp = {key:str(x)}
-                            print(tmp)
-                            rscript.append(tmp)
-                    else:
-                        rscript.append({key:text})
-        print(rscript)
-        return rscript
+                    text = rest[1].strip()
+                else:
+                    continue
+
+                if not key:
+                    continue
+
+                if self.segment:
+                    doc = nlp(text)
+                    for s in doc.sents:
+                        raw_segments.append((key, str(s).strip()))
+                else:
+                    raw_segments.append((key, text.strip()))
+
+        # Step 2: merge segments into 10–22 word chunks
+        merged = []
+        current_key = None
+        current_text = []
+
+        MIN_WORDS = 10
+        MAX_WORDS = 22
+
+        for key, seg in raw_segments:
+            words = seg.split()
+
+            # If starting a new speaker block
+            if current_key is None:
+                current_key = key
+                current_text = words
+                continue
+
+            # If same speaker, try merging
+            if key == current_key:
+                if len(current_text) + len(words) <= MAX_WORDS:
+                    current_text.extend(words)
+                else:
+                    # finalize current
+                    merged.append({current_key: " ".join(current_text)})
+                    current_key = key
+                    current_text = words
+            else:
+                # speaker changed → finalize current
+                merged.append({current_key: " ".join(current_text)})
+                current_key = key
+                current_text = words
+
+        # finalize last
+        if current_key is not None:
+            merged.append({current_key: " ".join(current_text)})
+
+        return merged
+
 
     def existing(self, js):
         if os.path.exists(js):

@@ -4,6 +4,8 @@ from json import dump, load
 import soundfile as sf
 import numpy as np
 from spacy_download import load_spacy
+from plan10.lib.config import load_environ
+load_environ()
 from plan10.lib.dialog import CloneVoice, DialogSession
 
 # uv run spacy download en_core_web_sm
@@ -51,7 +53,7 @@ class Voice(object):
         current_text = []
 
         MIN_WORDS = 10
-        MAX_WORDS = 15
+        MAX_WORDS = int(os.environ.get('MAX_WORDS', '15'))
 
         for key, seg in raw_segments:
             words = seg.split()

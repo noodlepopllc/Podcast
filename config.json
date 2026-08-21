@@ -21,5 +21,6 @@
     "MMH3": "False",
     "WGP": "True",
     "LTX": "DISTILLED",
-    "ANIME": "False"
+    "ANIME": "False",
+    "MAX_WORDS": "22"
 }

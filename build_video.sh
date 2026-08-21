@@ -26,11 +26,11 @@ if [[ "$MODE" -eq 0 ]]; then
         uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/anchor_newscast.txt
         uv run scripts/script_reader.py -s -i current_newscast/anchor_newscast.txt -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
-        uv run scripts/combiner.py newscast_wavs newscast_wavs_out
+        #uv run scripts/combiner.py newscast_wavs newscast_wavs_out
     fi
 
 
-    INPUT_DIR="newscast_wavs_out"
+    INPUT_DIR="newscast_wavs"
     prefix="anchor"
     ACTOR="$ANCHOR"
     PROMPT="She speaks calmly with a neutral pleasing smile. "
@@ -59,10 +59,10 @@ if [[ "$MODE" -eq 1 ]]; then
         uv run llm -S current_podcast/gamingnews.txt -M 32786 -P " " -O current_podcast/gamingnews_script.txt
         uv run scripts/to_script.py -I current_podcast/gamingnews_script.txt -S Gamer -O current_podcast/gamer_podcast.txt
         uv run scripts/script_reader.py -s -i current_podcast/gamer_podcast.txt  -r $GAMER_VOICE -n Gamer -o podcast_wavs
-        uv run scripts/combiner.py podcast_wavs podcast_wavs_out
+        #uv run scripts/combiner.py podcast_wavs podcast_wavs_out
     fi
 
-    INPUT_DIR="podcast_wavs_out"
+    INPUT_DIR="podcast_wavs"
     prefix="gamer"
     ACTOR="$GAMER"
     PROMPT="She speaks with excitement and enthusiasm as she sits behind the desk with a smile. "
@@ -91,10 +91,10 @@ if [[ "$MODE" -eq 2 ]]; then
         uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt
         uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/science_educast.txt
         uv run scripts/script_reader.py -s -i current_educast/science_educast.txt -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
-        uv run scripts/combiner.py educast_wavs educast_wavs_out
+        #uv run scripts/combiner.py educast_wavs educast_wavs_out
     fi
 
-    INPUT_DIR="educast_wavs_out"
+    INPUT_DIR="educast_wavs"
     prefix="scientist"
     ACTOR="$SCIENTIST"
     PROMPT="She speaks with enthusiasm and a subtle smile. "

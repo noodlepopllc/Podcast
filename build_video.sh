@@ -25,7 +25,7 @@ if [[ "$MODE" -eq 0 ]]; then
         uv run scripts/get_news.py -O current_newscast/worldnews.txt
         uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/anchor_newscast.txt
-        uv run script/script_reader.py -s -i current_newscast/anchor_newscast.txt -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
+        uv run scripts/script_reader.py -s -i current_newscast/anchor_newscast.txt -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
         uv run scripts/combiner.py newscast_wavs newscast_wavs_out
     fi
 
@@ -58,7 +58,7 @@ if [[ "$MODE" -eq 1 ]]; then
         uv run scripts/get_news.py -G -O current_podcast/gamingnews.txt
         uv run llm -S current_podcast/gamingnews.txt -M 32786 -P " " -O current_podcast/gamingnews_script.txt
         uv run scripts/to_script.py -I current_podcast/gamingnews_script.txt -S Gamer -O current_podcast/gamer_podcast.txt
-        uv run script/script_reader.py -s -i current_podcast/gamer_podcast.txt  -r $GAMER_VOICE -n Gamer -o podcast_wavs
+        uv run scripts/script_reader.py -s -i current_podcast/gamer_podcast.txt  -r $GAMER_VOICE -n Gamer -o podcast_wavs
         uv run scripts/combiner.py podcast_wavs podcast_wavs_out
     fi
 
@@ -90,7 +90,7 @@ if [[ "$MODE" -eq 2 ]]; then
         uv run scripts/get_news.py -S -O current_educast/sciencenews.txt
         uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt
         uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/science_educast.txt
-        uv run script/script_reader.py -s -i current_educast/science_educast.txt -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
+        uv run scripts/script_reader.py -s -i current_educast/science_educast.txt -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
         uv run scripts/combiner.py educast_wavs educast_wavs_out
     fi
 

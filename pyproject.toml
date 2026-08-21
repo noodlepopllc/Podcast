@@ -4,7 +4,6 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "plan10",
-    "scriptreader",
     "feedparser",
     "trafilatura",
     "bs4>=0.0.2",
@@ -12,5 +11,4 @@ dependencies = [
 
 [tool.uv.sources]
 plan10 = { git = "https://github.com/noodlepopllc/Plan10.git" }
-scriptreader = { git = "https://github.com/noodlepopllc/ScriptReader.git" }
 

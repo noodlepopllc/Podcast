@@ -97,8 +97,9 @@ class Voice(object):
         voice = self.config[key]['voice']
         text_path = path.replace('.wav','.txt')
         CloneVoice(text, voice, path, 15.0, lengthen=False, session=session)
-        Path(text_path).write_text(text)
-        return round(librosa.get_duration(path=path),2)
+        length = round(librosa.get_duration(path=path),2)
+        Path(text_path).write_text(f'{length}|{text}')
+        return length
 
     def run(self, script):
         jsonpath = script.split('.')[-2] + '.json'

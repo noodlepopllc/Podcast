@@ -123,7 +123,7 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
     echo "Processing $wav -> $out"
 
     #transcript="$OUTPUT_DIR/${prefix}${num}.txt"
-    transcript=$wav${wav%.*}.txt"
+    transcript="${wav%.*}.txt"
 
     echo "New transcript -> $transcript"
 

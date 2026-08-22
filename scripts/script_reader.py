@@ -1,4 +1,4 @@
-import sys, os, requests, librosa
+import sys, os, requests, librosa, math
 from pathlib import Path
 from json import dump, load
 import soundfile as sf
@@ -98,7 +98,7 @@ class Voice(object):
         text_path = path.replace('.wav','.txt')
         CloneVoice(text, voice, path, 15.0, lengthen=False, session=session)
         length = round(librosa.get_duration(path=path),2)
-        Path(text_path).write_text(f'{length}|{text}')
+        Path(text_path).write_text(f'{math.ceil(length)}|{text}')
         return length
 
     def run(self, script):

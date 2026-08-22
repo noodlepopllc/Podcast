@@ -95,7 +95,9 @@ class Voice(object):
 
     def create_wav(self, text, path='tmp2.wav', key='', session=None):
         voice = self.config[key]['voice']
+        text_path = path.replace('.wav','.txt')
         CloneVoice(text, voice, path, 15.0, lengthen=False, session=session)
+        Path(text_path).write_text(text)
         return round(librosa.get_duration(path=path),2)
 
     def run(self, script):

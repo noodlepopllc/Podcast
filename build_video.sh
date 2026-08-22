@@ -26,9 +26,10 @@ if [[ "$MODE" -eq 0 ]]; then
         uv run scripts/get_news.py -O current_newscast/worldnews.txt
         uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/$prefix.txt
-        uv run scripts/script_reader.py -s -i current_newscast/$prefix.txt -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
         #uv run scripts/combiner.py newscast_wavs newscast_wavs_out
     fi
+
+    uv run scripts/script_reader.py -s -i current_newscast/$prefix.txt -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
 
 
     INPUT_DIR="newscast_wavs"
@@ -59,9 +60,11 @@ if [[ "$MODE" -eq 1 ]]; then
         uv run scripts/get_news.py -G -O current_podcast/gamingnews.txt
         uv run llm -S current_podcast/gamingnews.txt -M 32786 -P " " -O current_podcast/gamingnews_script.txt
         uv run scripts/to_script.py -I current_podcast/gamingnews_script.txt -S Gamer -O current_podcast/$prefix.txt
-        uv run scripts/script_reader.py -s -i current_podcast/$prefix.txt  -r $GAMER_VOICE -n Gamer -o podcast_wavs
+        
         #uv run scripts/combiner.py podcast_wavs podcast_wavs_out
     fi
+
+    uv run scripts/script_reader.py -s -i current_podcast/$prefix.txt  -r $GAMER_VOICE -n Gamer -o podcast_wavs
 
     INPUT_DIR="podcast_wavs"
     ACTOR="$GAMER"
@@ -91,9 +94,10 @@ if [[ "$MODE" -eq 2 ]]; then
         uv run scripts/get_news.py -S -O current_educast/sciencenews.txt
         uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt
         uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/$prefix.txt
-        uv run scripts/script_reader.py -s -i current_educast/$prefix.txt -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
         #uv run scripts/combiner.py educast_wavs educast_wavs_out
     fi
+
+    uv run scripts/script_reader.py -s -i current_educast/$prefix.txt -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
 
     INPUT_DIR="educast_wavs"
     ACTOR="$SCIENTIST"
@@ -132,7 +136,7 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
 
     uv run speech_to_video \
         -A "$REF" \
-        -T "$text" \
+        -T "$text Stop. " \
         -P "$PROMPT" \
         -I "$ACTOR" \
         -D "$duration" \

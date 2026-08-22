@@ -122,9 +122,12 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
 
     echo "Processing $wav -> $out"
 
-    transcript="$OUTPUT_DIR/${prefix}${num}.txt"
+    #transcript="$OUTPUT_DIR/${prefix}${num}.txt"
+    transcript=$wav${wav%.*}.txt"
 
-    uv run dialog -R "$wav" -S -O "$transcript"
+    echo "New transcript -> $transcript"
+
+    #uv run dialog -R "$wav" -S -O "$transcript"
 
     duration=$(cut -d'|' -f1 "$transcript")
     duration=$((duration + 1))

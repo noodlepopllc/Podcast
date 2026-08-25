@@ -16,7 +16,7 @@
     "IMAGE_EDIT": "KLEIN",
     "WIDTH": "448",
     "HEIGHT": "832",
-    "SEED": "42",
+    "SEED": "48",
     "TRANSFORMERS_CACHE": "$HF_HOME",
     "MMH3": "False",
     "WGP": "True",

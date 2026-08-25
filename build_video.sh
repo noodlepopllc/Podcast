@@ -15,7 +15,7 @@ if [[ "$MODE" -eq 0 ]]; then
 
 
     if [[ ! -f "$ANCHOR_VOICE" ]]; then
-        uv run dialog -I "young adult, female, moderate pitch" -O "$ANCHOR_VOICE" 
+        uv run dialog -I "young adult, female, moderate pitch, american accent" -O "$ANCHOR_VOICE" 
     fi
 
     if [[ ! -f current_newscast/worldnews.txt ]]; then
@@ -49,7 +49,7 @@ if [[ "$MODE" -eq 1 ]]; then
 
 
     if [[ ! -f "$GAMER_VOICE" ]]; then
-        uv run dialog -I "young adult, female, high pitch" -O "$GAMER_VOICE" 
+        uv run dialog -I "young adult, female, high pitch, american accent" -O "$GAMER_VOICE" 
     fi
 
     if [[ ! -f current_podcast/gamingnews.txt ]]; then
@@ -83,7 +83,7 @@ if [[ "$MODE" -eq 2 ]]; then
 
 
     if [[ ! -f "$SCIENTIST_VOICE" ]]; then
-        uv run dialog -I "young adult, female, moderate pitch" -O "$SCIENTIST_VOICE" 
+        uv run dialog -I "young adult, female, moderate pitch, american accent" -O "$SCIENTIST_VOICE" 
     fi
 
     if [[ ! -f current_educast/sciencenews.txt ]]; then

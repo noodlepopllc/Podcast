@@ -8,7 +8,7 @@ OUTPUT_DIR="videos"
 if [[ "$MODE" -eq 0 ]]; then
     ANCHOR="media/anchor.png"
     ANCHOR_VOICE="media/anchor.wav"
-    prefix="anchor_newscast"
+    prefix="newscast"
     if [[ ! -f "$ANCHOR" ]]; then
         uv run image_gen -P "Photorealistic portrait of a beautiful young adult female newscaster sitting at a spacious news desk, warm confident smile, engaged expression with slightly raised eyebrows, subtle forward‑leaning posture, long wavy black hair with realistic strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft warm studio lighting with gentle highlights, wider professional news studio environment, open composition, holding a pen in one hand with papers on the desk." -O "$ANCHOR" -W 720 -H 1280
     fi
@@ -41,7 +41,7 @@ fi
 if [[ "$MODE" -eq 1 ]]; then
     GAMER="media/gamer.png"
     GAMER_VOICE="media/gamer.wav"
-    prefix="gamer_podcast"
+    prefix="podcast"
     
     if [[ ! -f "$GAMER" ]]; then
         uv run image_gen -P "Photorealistic portrait of a beautiful young adult female gaming podcaster sitting in front of her computer, dark natural roots transitioning into blonde hair with soft pink tips, realistic hair strands and natural highlights, v‑neck green t‑shirt, natural skin texture with subtle imperfections, mature feminine facial proportions, soft balanced studio lighting, professional streamer setup with monitor glow." -O "$GAMER" -W 720 -H 1280
@@ -75,7 +75,7 @@ fi
 if [[ "$MODE" -eq 2 ]]; then
     SCIENTIST="media/scientist.png"
     SCIENTIST_VOICE="media/scientist.wav"
-    prefix="scientist_educast"
+    prefix="educast"
 
     if [[ ! -f "$SCIENTIST" ]]; then
         uv run image_gen -P "Photorealistic portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing black‑rimmed reading glasses, soft natural makeup, a fitted white camisole top, casual modern slacks, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W 720 -H 1280
@@ -113,7 +113,7 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
 
     base=$(basename "$wav" .wav)
     num=${base#clip_}
-    out="$OUTPUT_DIR/${prefix}${num}.mp4"
+    out="$OUTPUT_DIR/${num}.mp4"
 
     if [[ -f "$out" ]]; then
         echo "Skipping $wav — output already exists: $out"

@@ -1,13 +1,14 @@
 # Podcast
 Generate podcasts from RSS feeds
 
-For defauult LTX settings with local wangp need the following lora
+For default LTX settings with local wangp need the following lora
+
+Copy this lora into Wan2GP/loras/ltx2 folder
 
 ```
 hf download DeepBeepMeep/LTX-2 id-lora-celebvhq-ltx2.3.safetensors --local-dir .
 ```
 
-Copy this lora into Wan2GP/loras/ltx2 folder
 
 ```
 ./build_video.sh 0 # Global news

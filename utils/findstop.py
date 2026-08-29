@@ -112,6 +112,8 @@ def trim_wav(json_file, wav_file, output):
 
     # Zero out trailing audio
     audio[cut_sample:] = 0.0
+    audio[-2400:] = 0.0   # 50 ms at 48k
+
 
     # write cleaned audio
     sf.write(wav_file.replace('.wav', '_clean.wav'), audio, sr)

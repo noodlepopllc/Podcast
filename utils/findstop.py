@@ -60,7 +60,7 @@ def stop_frame_from_sample(stop_sample, fps=24, sr=48000):
 
 def sample_end(stop_time, sr=48000, fps=24, start=True):
     if start:
-        return int(stop_time * sr) - ((sr // fps) * 5)
+        return int(stop_time * sr) - ((sr // fps) * 7)
     else:
         return int(stop_time * sr) + ((sr // fps) * 3)
 

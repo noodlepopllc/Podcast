@@ -1,0 +1,6 @@
+[
+    "https://www.pbs.org/newshour/feeds/rss/science",
+    "https://www.esa.int/rssfeed/Our_Activities/Observing_the_Earth",
+    "https://feeds.npr.org/1007/rss.xml",
+    "https://www.sciencedaily.com/rss/top/science.xml"
+]

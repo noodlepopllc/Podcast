@@ -1,0 +1,6 @@
+[
+    "https://news.xbox.com/en-us/feed",
+    "https://purexbox.com/feeds/news",
+    "https://trueachievements.com/newsrss",
+    "https://gamerant.com/feed/tag/xbox"
+]

@@ -1,0 +1,6 @@
+[
+    "https://www.npr.org/rss/rss.php?id=1001",
+    "https://feeds.bbci.co.uk/news/world/rss.xml",
+    "https://www.pbs.org/newshour/feeds/rss",
+    "https://www.aljazeera.com/xml/rss/all.xml"
+]

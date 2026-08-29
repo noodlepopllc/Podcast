@@ -63,6 +63,7 @@ def parse_timestamp(entry):
         return datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
     if hasattr(entry, "updated_parsed") and entry.updated_parsed:
         return datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
+
     return None
 
 def fetch_items(feeds):
@@ -92,16 +93,48 @@ def fetch_items(feeds):
     return items
 
 def filter_recent(items, hours=24):
-    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
-    return [item for item in items if datetime.fromisoformat(item["published"]) > cutoff]
+    # 1. Create a naive UTC target object
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    
+    recent_items = []
+    for item in items:
+        try:
+            # 2. Extract date and strip any timezone tracking strings if present
+            # Splits on 'Z' or '+' to ensure we isolate the clean core timestamp
+            clean_pub = item["published"].split('+')[0].split('Z')[0]
+            
+            # 3. Parse as a naive datetime object
+            # Handles 'YYYY-MM-DDTHH:MM:SS' or fall back to date layout
+            if 'T' in clean_pub:
+                dt_item = datetime.fromisoformat(clean_pub)
+            else:
+                dt_item = datetime.strptime(clean_pub, "%Y-%m-%d")
+                
+            # 4. Compare naive vs naive directly
+            if dt_item > cutoff:
+                recent_items.append(item)
+                
+        except Exception as e:
+            print(f"⚠ Skipping item date parsing mismatch: {e}")
+            continue
+            
+    return recent_items
+
 
 def main():
     import argparse
+    from pathlib import Path
     parser = argparse.ArgumentParser()
     parser.add_argument('-S', '--science', action='store_true', help='Set to science and technology')
     parser.add_argument('-G', '--gaming', action='store_true', help='Set to gaming news')
+    parser.add_argument('-R', '--rss', type=str, default='')
+    parser.add_argument('-P', '--prompt', type=str, default='prompts/news.txt', help='System prompt to use')
     parser.add_argument('-O', '--output', type=str, default='today.txt')
+    parser.add_argument('-L', '--latest', action='store_true', help='Get lastest news only')
     args = parser.parse_args()
+    topic = json.loads(Path(args.rss).read_text())
+    prompt = args.prompt
+    '''
     if args.science:
         topic = SCI_TECH_FEEDS
         prompt = 'prompts/science.txt'
@@ -109,11 +142,16 @@ def main():
         topic = XBOX_NEWS_FEEDS
         prompt = 'prompts/gamer.txt'
     else:
-        topic = WORLD_NEWS_FEEDS
-        prompt = 'prompts/news.txt'
+        if args.rss:
+            topic = [args.rss]
+        else:
+            topic = WORLD_NEWS_FEEDS
+        prompt = args.custom 
+    '''
     items = fetch_items(topic)
-    recent = filter_recent(items)
-    limited = limit_diverse_top_n(recent,3)
+    if args.latest:
+        items = filter_recent(items)
+    limited = limit_diverse_top_n(items,3)
 
     for i, item in enumerate(limited, 1):
         item["id"] = i

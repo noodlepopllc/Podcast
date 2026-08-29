@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+uv run config -R
+source .env
+
 MODE=${1:-0}
 mkdir -p media
 OUTPUT_DIR="videos"
@@ -10,7 +13,7 @@ if [[ "$MODE" -eq 0 ]]; then
     ANCHOR_VOICE="media/anchor.wav"
     prefix="newscast"
     if [[ ! -f "$ANCHOR" ]]; then
-        uv run image_gen -P "Photorealistic portrait of a beautiful young adult female newscaster sitting at a spacious news desk, warm confident smile, engaged expression with slightly raised eyebrows, subtle forward‑leaning posture, long wavy black hair with realistic strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft warm studio lighting with gentle highlights, wider professional news studio environment, open composition, holding a pen in one hand with papers on the desk." -O "$ANCHOR" -W 720 -H 1280
+        uv run image_gen -P "Photorealistic portrait of a beautiful young adult female newscaster sitting at a spacious news desk, warm confident smile, engaged expression with slightly raised eyebrows, subtle forward‑leaning posture, long wavy black hair with realistic strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft warm studio lighting with gentle highlights, wider professional news studio environment, open composition, holding a pen in one hand with papers on the desk." -O "$ANCHOR" -W $WIDTH -H $HEIGHT
     fi
 
 
@@ -23,7 +26,7 @@ if [[ "$MODE" -eq 0 ]]; then
         rm -f newscast_wavs/*
         #rm -f newscast_wavs_out/*
         mkdir -p current_newscast
-        uv run scripts/get_news.py -O current_newscast/worldnews.txt
+        uv run scripts/get_news.py -R "feeds/news.txt" -P "prompts/news.txt" -O current_newscast/worldnews.txt -L 
         uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/$prefix.txt
         #uv run scripts/combiner.py newscast_wavs newscast_wavs_out
@@ -44,7 +47,7 @@ if [[ "$MODE" -eq 1 ]]; then
     prefix="podcast"
     
     if [[ ! -f "$GAMER" ]]; then
-        uv run image_gen -P "Photorealistic portrait of a beautiful young adult female gaming podcaster sitting in front of her computer, dark natural roots transitioning into blonde hair with soft pink tips, realistic hair strands and natural highlights, v‑neck green t‑shirt, natural skin texture with subtle imperfections, mature feminine facial proportions, soft balanced studio lighting, professional streamer setup with monitor glow." -O "$GAMER" -W 720 -H 1280
+        uv run image_gen -P "Photorealistic portrait of a beautiful young adult female gaming podcaster sitting in front of her computer, dark natural roots transitioning into blonde hair with soft pink tips, realistic hair strands and natural highlights, v‑neck green t‑shirt, natural skin texture with subtle imperfections, mature feminine facial proportions, soft balanced studio lighting, professional streamer setup with monitor glow." -O "$GAMER" -W $WIDTH -H $HEIGHT
     fi
 
 
@@ -57,7 +60,7 @@ if [[ "$MODE" -eq 1 ]]; then
         rm -f podcast_wavs/*
         #rm -f podcast_wavs_out/*
         mkdir -p current_podcast
-        uv run scripts/get_news.py -G -O current_podcast/gamingnews.txt
+        uv run scripts/get_news.py -R "feeds/gaming.txt" -P "prompts/gamer.txt" -O current_podcast/gamingnews.txt -L 
         uv run llm -S current_podcast/gamingnews.txt -M 32786 -P " " -O current_podcast/gamingnews_script.txt
         uv run scripts/to_script.py -I current_podcast/gamingnews_script.txt -S Gamer -O current_podcast/$prefix.txt
         
@@ -78,7 +81,8 @@ if [[ "$MODE" -eq 2 ]]; then
     prefix="educast"
 
     if [[ ! -f "$SCIENTIST" ]]; then
-        uv run image_gen -P "Photorealistic portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing black‑rimmed reading glasses, soft natural makeup, a fitted white camisole top, casual modern slacks, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W 720 -H 1280
+        #uv run image_gen -P "Photorealistic medium closeup portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing black‑rimmed reading glasses, soft natural makeup, a fitted white camisole top, casual modern slacks, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W $WIDTH -H $HEIGHT
+        uv run image_gen -P "Photorealistic medium closeup portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing reading glasses, soft natural makeup, a fitted white camisole top, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W $WIDTH -H $HEIGHT
     fi
 
 
@@ -91,7 +95,7 @@ if [[ "$MODE" -eq 2 ]]; then
         rm -f educast_wavs/*
         #rm -f educast_wavs_out/*
         mkdir -p current_educast
-        uv run scripts/get_news.py -S -O current_educast/sciencenews.txt
+        uv run scripts/get_news.py -R "feeds/science.txt" -P "prompts/science.txt" -O current_educast/sciencenews.txt -L 
         uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt
         uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/$prefix.txt
         #uv run scripts/combiner.py educast_wavs educast_wavs_out
@@ -113,7 +117,7 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
 
     base=$(basename "$wav" .wav)
     num=${base#clip_}
-    out="$OUTPUT_DIR/${num}.mp4"
+    out="$OUTPUT_DIR/${prefix}_${num}.mp4"
 
     if [[ -f "$out" ]]; then
         echo "Skipping $wav — output already exists: $out"
@@ -122,27 +126,45 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
 
     echo "Processing $wav -> $out"
 
-    #transcript="$OUTPUT_DIR/${prefix}${num}.txt"
     transcript="${wav%.*}.txt"
 
     echo "New transcript -> $transcript"
-
-    #uv run dialog -R "$wav" -S -O "$transcript"
 
     duration=$(cut -d'|' -f1 "$transcript")
     duration=$((duration + 1))
     text=$(cut -d'|' -f2 "$transcript")
 
-    #wav="$OUTPUT_DIR/clip${num}.wav"
-    
-    #uv run dialog -R "$REF" -T "$text" -D $duration -O $wav
-
     uv run speech_to_video \
         -A "$REF" \
-        -T "$text Stop. " \
+        -T "$text Stop." \
         -P "$PROMPT" \
         -I "$ACTOR" \
         -D "$duration" \
         -O "$out"
 done
 
+echo "=================================================="
+echo " FILE ISOLATION PASS"
+echo "=================================================="
+
+# 1. Grab today's system date in DDMMYY format
+DATE_STR=$(date +"%d%m%y")
+ARCHIVE_FOLDER="${DATE_STR}_${prefix}"
+
+echo "Creating pristine run directory: $ARCHIVE_FOLDER"
+mkdir -p "$ARCHIVE_FOLDER"
+
+# 2. MOVE the fresh video files into the folder immediately 
+# This completely clears out the raw output bucket so no strays can interfere
+if ls "$OUTPUT_DIR"/${prefix}_*.mp4 1>/dev/null 2>&1; then
+    mv "$OUTPUT_DIR"/${prefix}_*.mp4 "$ARCHIVE_FOLDER/"
+    echo "Successfully moved all fresh raw files into $ARCHIVE_FOLDER/"
+else
+    echo "Warning: No matching generated files found to isolate."
+fi
+
+echo "=================================================="
+echo " RUNNING COMPILER PIPELINE"
+echo "=================================================="
+
+echo "All generation and processing tasks successfully completed!"

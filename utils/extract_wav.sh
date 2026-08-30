@@ -23,15 +23,14 @@ for ((i=0; i<num_files; i++)); do
     ffmpeg -i "$INPUT" -vn -ac 1 -ar 48000 "$output"
     ffmpeg -i "$INPUT" -an -r 24 -vf "fps=24" "$INBOUND/%06d.png"
 
-    uvx whisperx $output --language English --task transcribe --output_format json --output_dir $WORK
-
+    uvx --from openai-whisper whisper $output --language English --task transcribe --output_format json --model large-v2 --clip_timestamps 0.0 --word_timestamps True --output_dir $WORK 
     json="$WORK/${basename%.mp4}.json"
 
     while [ ! -s "$json" ]; do
         sleep 0.05
     done
 
-    uv run utils/findstop.py -I $output -O $INBOUND
+    uv run utils/findstop.py -I $output -O $INBOUND 
 
     cleaned="$WORK/${basename%.mp4}_clean.wav"
     video="$WORK/$(printf '%03d' "$i")_clip.mp4"
@@ -49,9 +48,14 @@ for ((i=0; i<num_files; i++)); do
         ffmpeg -framerate 24 -loop 1 -i "$first" -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/first.mp4
         ffmpeg -framerate 24 -loop 1 -i "$last"  -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/last.mp4
 
+        #ffmpeg -i $WORK/first.mp4 -i $WORK/last.mp4 \
+        #    -filter_complex "xfade=transition=fade:duration=0.25:offset=0" \
+        #    -c:v libx264 -pix_fmt yuv420p "$transition"
+
         ffmpeg -i $WORK/first.mp4 -i $WORK/last.mp4 \
-            -filter_complex "xfade=transition=fade:duration=0.25:offset=0" \
+            -filter_complex "[0]format=yuv420p, gblur=sigma=2[fg]; [1]format=yuv420p, gblur=sigma=2[bg]; [fg][bg]xfade=transition=fade:duration=0.40:offset=0" \
             -c:v libx264 -pix_fmt yuv420p "$transition"
+
 
         rm $WORK/first.mp4
         rm $WORK/last.mp4

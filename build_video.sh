@@ -8,12 +8,31 @@ MODE=${1:-0}
 mkdir -p media
 OUTPUT_DIR="videos"
 
+if [[ "$ANIME" != "False" ]]; then
+    GEN_CMD="anime_gen"
+
+    # Anime‑specific character descriptors
+    DESC_NEWSCASTER="Young adult female newscaster seated at a spacious news desk, warm confident smile, slightly raised eyebrows, gentle forward‑leaning posture, long wavy hair with soft highlights, business blazer, friendly professional demeanor, holding a pen with papers on the desk, bright studio environment."
+    DESC_GAMER="Young adult female gaming podcaster sitting in front of her computer, dark roots transitioning into blonde hair with soft pink tips, v‑neck green t‑shirt, energetic friendly expression, relaxed posture, streamer desk setup with glowing monitor."
+    DESC_SCIENTIST="Young adult half‑Asian educator with a short blonde bobcut with dark roots, wearing reading glasses, fitted white camisole top, warm friendly expression, confident posture, standing in a bright modern library with sunlit windows."
+
+else
+    GEN_CMD="image_gen"
+
+    # Realistic descriptors
+    DESC_NEWSCASTER="Photorealistic portrait of a beautiful young adult female newscaster sitting at a spacious news desk, warm confident smile, engaged expression with slightly raised eyebrows, subtle forward‑leaning posture, long wavy black hair with realistic strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft warm studio lighting with gentle highlights, wider professional news studio environment, open composition, holding a pen in one hand with papers on the desk."
+    DESC_GAMER="Photorealistic portrait of a beautiful young adult female gaming podcaster sitting in front of her computer, dark natural roots transitioning into blonde hair with soft pink tips, realistic hair strands and natural highlights, v‑neck green t‑shirt, natural skin texture with subtle imperfections, mature feminine facial proportions, soft balanced studio lighting, professional streamer setup with monitor glow."
+    DESC_SCIENTIST="Photorealistic medium closeup portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing thin low‑profile reading glasses with clear anti‑reflective lenses that do not obscure the eyes or cast shadows on the cheeks. Soft natural makeup, smooth natural skin, warm friendly expression, subtle confident posture, wearing a fitted white camisole top. Bright modern library with sunlit windows, soft frontal daylight that evenly illuminates the face and keeps the mouth, lips, and cheek curvature fully visible for accurate lipsync. Clean polished composition with unobstructed facial landmarks and no glare on the lenses."
+fi
+
+
+
 if [[ "$MODE" -eq 0 ]]; then
     ANCHOR="media/anchor.png"
     ANCHOR_VOICE="media/anchor.wav"
     prefix="newscast"
     if [[ ! -f "$ANCHOR" ]]; then
-        uv run image_gen -P "Photorealistic portrait of a beautiful young adult female newscaster sitting at a spacious news desk, warm confident smile, engaged expression with slightly raised eyebrows, subtle forward‑leaning posture, long wavy black hair with realistic strands and natural highlights, business blazer, natural skin texture with subtle imperfections, mature feminine facial proportions, soft warm studio lighting with gentle highlights, wider professional news studio environment, open composition, holding a pen in one hand with papers on the desk." -O "$ANCHOR" -W $WIDTH -H $HEIGHT
+        uv run "$GEN_CMD" -P "$DESC_NEWSCASTER" -O "$ANCHOR" -W $WIDTH -H $HEIGHT
     fi
 
 
@@ -47,7 +66,7 @@ if [[ "$MODE" -eq 1 ]]; then
     prefix="podcast"
     
     if [[ ! -f "$GAMER" ]]; then
-        uv run image_gen -P "Photorealistic portrait of a beautiful young adult female gaming podcaster sitting in front of her computer, dark natural roots transitioning into blonde hair with soft pink tips, realistic hair strands and natural highlights, v‑neck green t‑shirt, natural skin texture with subtle imperfections, mature feminine facial proportions, soft balanced studio lighting, professional streamer setup with monitor glow." -O "$GAMER" -W $WIDTH -H $HEIGHT
+        uv run "$GEN_CMD" -P "$DESC_GAMER" -O "$GAMER" -W $WIDTH -H $HEIGHT
     fi
 
 
@@ -82,7 +101,7 @@ if [[ "$MODE" -eq 2 ]]; then
 
     if [[ ! -f "$SCIENTIST" ]]; then
         #uv run image_gen -P "Photorealistic medium closeup portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing black‑rimmed reading glasses, soft natural makeup, a fitted white camisole top, casual modern slacks, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W $WIDTH -H $HEIGHT
-        uv run image_gen -P "Photorealistic medium closeup portrait of an attractive young adult half‑Asian influencer with a short blonde bobcut with dark roots, wearing reading glasses, soft natural makeup, a fitted white camisole top, smooth natural skin, warm friendly expression, subtle confident posture, standing in a bright modern library with sunlit windows, soft flattering daylight, clean polished composition." -O "$SCIENTIST" -W $WIDTH -H $HEIGHT
+        uv run "$GEN_CMD" -P "$DESC_SCIENTIST" -O "$SCIENTIST" -W $WIDTH -H $HEIGHT
     fi
 
 

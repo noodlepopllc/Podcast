@@ -40,29 +40,60 @@ def trim_video_frames_back(frames_dir, stop_frame):
             f.unlink()
 
 
-def get_stop_time(json_file):
+from pathlib import Path
+import json
+
+def get_stop_time_debug(json_file):
     timings = json.loads(Path(json_file).read_text())
-    words = timings['segments'][-1]['words']
 
-    # Search backwards for the first word starting with "pop"
-    for w in reversed(words):
-        if w['word'].lower().startswith("propeller"):
-            return w['start'], True
+    # Flatten all words across all segments
+    all_words = []
+    for si, seg in enumerate(timings['segments']):
+        for w in seg['words']:
+            all_words.append({
+                "seg_index": si,
+                "word": w['word'],
+                "start": w['start'],
+                "end": w['end'],
+            })
 
-    # Fallback: use the last word's end time
-    last_word = words[-1]
-    return last_word['end'], False
+    print("ALL WORDS:")
+    for i, w in enumerate(all_words):
+        print(f"{i}: [seg {w['seg_index']}] {w['word']} {w['start']} → {w['end']}")
 
+    prev_end = None
+
+    # Search backwards for "propeller"
+    for i in range(len(all_words)-1, -1, -1):
+        w = all_words[i]
+        if w['word'].strip().lower().startswith("propeller"):
+            print(f"\nFOUND PROPELLER at index {i}: {w}")
+            if i > 0:
+                prev_end = all_words[i-1]['end']
+                print(f"PREV WORD at index {i-1}: {all_words[i-1]}")
+            else:
+                print("NO PREV WORD (propeller is first)")
+            stop_time = w['start']
+            print(f"\nRETURNING stop_time={stop_time}, prev_end={prev_end}, isStop=True")
+            return (stop_time, prev_end, True)
+
+    # fallback
+    last_word = all_words[-1]
+    print(f"\nNO PROPELLER FOUND, FALLBACK TO LAST WORD: {last_word}")
+    stop_time = last_word['end']
+    print(f"RETURNING stop_time={stop_time}, prev_end=None, isStop=False")
+    return (stop_time, None, False)
 
 def stop_frame_from_sample(stop_sample, fps=24, sr=48000):
     stop_time = stop_sample / sr
-    return int(stop_time * fps)
+    return round(stop_time * fps)
+
 
 def sample_end(stop_time, sr=48000, fps=24, start=True):
     if start:
-        return int(stop_time * sr) - ((sr // fps) * 8)
+        return int(stop_time * sr) - ((sr // fps) * 3)
     else:
-        return int(stop_time * sr) + ((sr // fps) * 3)
+        return int(stop_time * sr) + ((sr // fps) * 8)
 
 def trim_video_frames(frames_dir, stop_frame):
     frames_dir = Path(frames_dir)
@@ -78,53 +109,68 @@ def trim_video_frames(frames_dir, stop_frame):
 def trim_wav(json_file, wav_file, output):
     audio, sr = sf.read(wav_file)
 
-    # FRONT TRIM (audio energy)
-    start_sample = find_first_sound(audio)
-    audio = audio[start_sample:]
+    # ----------------------------------------
+    # 1. GET STOP TIME + PREV END (original timeline)
+    # ----------------------------------------
+    stop_time, prev_end, isStop = get_stop_time_debug(json_file)
 
-    # BACK TRIM (WhisperX)
-    stop_time, isStop = get_stop_time(json_file)
-    stop_sample = sample_end(stop_time, start=isStop)
-    audio = audio[:stop_sample]
+    # ----------------------------------------
+    # 2. SEMANTIC CUTOFF (original timeline)
+    # ----------------------------------------
+    if isStop and prev_end is not None:
+        semantic_cut = int(0.5 * (prev_end + stop_time) * sr)
+    else:
+        semantic_cut = sample_end(stop_time, start=isStop)
 
-    # --- TRAILING SILENCE DETECTION ---
-    win = int(0.02 * sr)            # 20ms window
-    threshold = 0.003               # RMS threshold
-    required_silence = int(0.20*sr) # 200ms sustained silence
+    semantic_cut = min(semantic_cut, len(audio))
 
-    silence_accum = 0
-    cut_sample = len(audio)
+    # ----------------------------------------
+    # 3. BACKWARD VOICED-REGION DETECTION (original timeline)
+    # ----------------------------------------
+    back_win = int(0.01 * sr)   # 10ms window
+    voiced_thresh = 0.02        # voiced energy threshold
 
-    for i in range(stop_sample, len(audio), win):
-        window = audio[i:i+win]
-        if len(window) == 0:
+    refined_cut = semantic_cut
+
+    for i in range(semantic_cut, back_win, -back_win):
+        window = audio[i-back_win:i]
+        energy = np.max(np.abs(window))
+
+        if energy > voiced_thresh:
+            refined_cut = i
             break
 
-        rms = np.sqrt(np.mean(window**2))
+    # ----------------------------------------
+    # 4. HARD TRIM END FIRST (correct order)
+    # ----------------------------------------
+    audio = audio[:refined_cut]
 
-        if rms < threshold:
-            silence_accum += win
-            if silence_accum >= required_silence:
-                cut_sample = i
-                break
-        else:
-            silence_accum = 0
+    # 50ms safety zeroing
+    if len(audio) > 2400:
+        audio[-2400:] = 0.0
 
-    # Zero out trailing audio
-    audio[cut_sample:] = 0.0
-    audio[-2400:] = 0.0   # 50 ms at 48k
-
-
-    # write cleaned audio
-    sf.write(wav_file.replace('.wav', '_clean.wav'), audio, sr)
-
-    # VIDEO TRIM
-    start_frame = stop_frame_from_sample(start_sample)
-    stop_frame  = stop_frame_from_sample(stop_sample)
-
-    trim_video_frames_front(output, start_frame)
+    # ----------------------------------------
+    # 5. VIDEO TRIM END FIRST (correct order)
+    # ----------------------------------------
+    stop_frame = stop_frame_from_sample(refined_cut)
     trim_video_frames_back(output, stop_frame)
 
+    # ----------------------------------------
+    # 6. NOW detect first sound (safe AFTER end trim)
+    # ----------------------------------------
+    start_sample = find_first_sound(audio)
+    start_frame  = stop_frame_from_sample(start_sample)
+
+    # ----------------------------------------
+    # 7. TRIM FRONT LAST (correct order)
+    # ----------------------------------------
+    audio = audio[start_sample:]
+    trim_video_frames_front(output, start_frame)
+
+    # ----------------------------------------
+    # 8. WRITE CLEAN AUDIO
+    # ----------------------------------------
+    sf.write(wav_file.replace('.wav', '_clean.wav'), audio, sr)
 
 
 def main():

@@ -12,7 +12,7 @@
     "LLM_BACKEND": "transformers",
     "OLLAMA_URL": "http://localhost:11434",
     "OLLAMA_MODEL": "qwen3.5:latest",
-    "IMAGE_GEN": "KLEIN",
+    "IMAGE_GEN": "KREA2",
     "IMAGE_EDIT": "KLEIN",
     "WIDTH": "448",
     "HEIGHT": "768",
@@ -23,5 +23,5 @@
     "LTX": "DISTILLED",
     "ANIME": "False",
     "VERBOSE": "False",
-    "MAX_WORDS": "32"
+    "MAX_WORDS": "22"
 }

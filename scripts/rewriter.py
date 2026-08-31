@@ -8,35 +8,52 @@ def scan_sentence(sentence: str) -> dict:
     word_count = len(words)
     issues = []
 
-    # 1. Phoneme cluster detection (Look for 3+ clusters in the SAME sentence, or heavy multi-consonants)
-    # Changed to count true high-risk clusters, ignoring simple "nt" or "th" unless frequent
+    if word_count == 0:
+        return {"sentence": sentence, "word_count": 0, "issues": [], "needs_rewrite": False}
+
+    # === FIXED: Text-Based Phonetic Sibilance Tracker ===
+    # 1. Standard literal sibilants
+    sibilant_count = len(re.findall(r'[sz]', s))
+    
+    # 2. Hard-to-catch soft 'c' sounds (ce, ci, cy) like "sentence", "fences", "decide"
+    soft_c_count = len(re.findall(r'c[eiy]', s))
+    
+    # 3. Fricative combos (sh, ch, x as 'ks')
+    fricative_combos = len(re.findall(r'(sh|ch|x)', s))
+    
+    total_sibilance = sibilant_count + soft_c_count + fricative_combos
+    sibilance_ratio = total_sibilance / word_count
+
+    # Flag if sentence has high sibilant sound concentration
+    if sibilance_ratio > 0.35 or total_sibilance >= 5:
+        issues.append("heavy_sibilance_friction")
+
+    # === Rest of your existing checks ===
+    # 1. Phoneme cluster detection 
     cluster_patterns = [r"spr", r"str", r"sk", r"st", r"pl", r"tr"]
     cluster_hits = sum(len(re.findall(p, s)) for p in cluster_patterns)
-    
-    # Only flag if there's a heavy concentration of friction
     if cluster_hits >= 3:
         issues.append("cluster_dense_friction")
 
-    # 2. Low-energy ending detection
-    if re.search(r"(sh|th|f)\.$", s): # Removed 's, z, r' as Kokoro handles trailing sibilants/rhotics fine
+    # 2. Low-energy ending detection (Added soft 'ce' to endings to prevent truncation)
+    if re.search(r"(sh|th|f|ce)\.$", s): 
         issues.append("low_energy_ending")
 
-    # 3. Multi-fricative ending words (Keep, these cause Whisper truncation)
+    # 3. Multi-fricative ending words 
     fricative_endings = ["sources", "research", "percent"]
     if any(s.endswith(w + ".") for w in fricative_endings):
         issues.append("multi_fricative_ending")
 
-    # 4. Missing pauses (Only flag if sentence is long AND missing a pause)
+    # 4. Missing pauses 
     if word_count > 15 and not re.search(r",|;|—|-", sentence):
         issues.append("no_pause_in_long_span")
 
-    # 5. Breath-unit overload (Adjusted to your true 18-22 word pipeline sweet spot)
+    # 5. Breath-unit overload 
     if word_count > 22:
         issues.append("breath_unit_overload")
 
-    # 6. Micro-stutter risk (Look for colliding plosives across word boundaries)
-    # Example: "stop playing" (p -> p) or "bad dog" (d -> d)
-    if len(re.findall(r"(?:s|th|t|p)\s+(?:s|th|t|p)", s)) > 2: # Bumped threshold to 2+ instances
+    # 6. Micro-stutter risk 
+    if len(re.findall(r"(?:s|th|t|p)\s+(?:s|th|t|p)", s)) > 2: 
         issues.append("micro_stutter_risk")
 
     return {
@@ -45,6 +62,7 @@ def scan_sentence(sentence: str) -> dict:
         "issues": issues,
         "needs_rewrite": len(issues) > 0
     }
+
 
 
 

@@ -3,12 +3,13 @@ Your task is to fix the specific technical issues listed below. If an issue is p
 
 Execution Instructions:
 1. IF 'cluster_double_compression' or 'cluster_compression' is listed: You are REQUIRED to isolate the specific words containing dense consonants (such as spr, str, sk, st, pl, tr, nt, th) and aggressively rewrite them into smoother, vowel-forward phrasing. Do not modify the rest of the sentence.
-2. IF 'low_energy_ending' or 'multi_fricative_ending' is listed: You are REQUIRED to change the very last word of the sentence to an alternative that ends on a clear vowel sound or voiced consonant. 
-3. IF 'no_pause' is listed: Do not change any words. Simply insert a single natural comma into the sentence to provide a breath unit.
-4. IF 'micro_stutter_risk' is listed: Identify the exact word boundaries where identical plosives/sibilants collide (e.g., "gathered outside", "stop playing") and change one of those colliding words to remove the friction.
-5. IF NO ISSUES ARE LISTED: Return the original sentence exactly as written.
-6. Tone: Maintain the voice of the target persona ("{persona}"). Do not simplify non-flagged vocabulary words. Keep high-level phrasing intact unless a word directly contains a flagged error cluster.
-7. Output Format: Return ONLY the finalized, rewritten plain text line. Do not include commentary, formatting, or the speaker name.
+2. IF 'heavy_sibilance_friction' is listed: You are REQUIRED to locate words overflowing with "s", "z", "x", or soft "c" (ce, ci, cy) sounds (e.g., "these clips", "discussing", "sentence", "experts") and swap them for alternative words that use open vowels or non-sibilant consonants to prevent lip-sync distortion.
+3. IF 'low_energy_ending' or 'multi_fricative_ending' is listed: You are REQUIRED to change the very last word of the sentence to an alternative that ends on a clear vowel sound or voiced consonant. 
+4. IF 'no_pause' is listed: Do not change any words. Simply insert a single natural comma into the sentence to provide a breath unit.
+5. IF 'micro_stutter_risk' is listed: Identify the exact word boundaries where identical plosives/sibilants collide (e.g., "gathered outside", "stop playing") and change one of those colliding words to remove the friction.
+6. IF NO ISSUES ARE LISTED: Return the original sentence exactly as written.
+7. Tone: Maintain the voice of the target persona ("{persona}"). Do not simplify non-flagged vocabulary words. Keep high-level phrasing intact unless a word directly contains a flagged error cluster.
+8. Output Format: Return ONLY the finalized, rewritten plain text line. Do not include commentary, formatting, or the speaker name.
 
 Input Data:
 - Target Persona: "{persona}"

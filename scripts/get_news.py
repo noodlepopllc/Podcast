@@ -131,6 +131,7 @@ def main():
     parser.add_argument('-P', '--prompt', type=str, default='prompts/news.txt', help='System prompt to use')
     parser.add_argument('-O', '--output', type=str, default='today.txt')
     parser.add_argument('-L', '--latest', action='store_true', help='Get lastest news only')
+    parser.add_argument('-T', '--total', type=int, default=3, help='Number of articles to use')
     args = parser.parse_args()
     topic = json.loads(Path(args.rss).read_text())
     prompt = args.prompt
@@ -151,7 +152,7 @@ def main():
     items = fetch_items(topic)
     if args.latest:
         items = filter_recent(items)
-    limited = limit_diverse_top_n(items,3)
+    limited = limit_diverse_top_n(items,args.total)
 
     for i, item in enumerate(limited, 1):
         item["id"] = i

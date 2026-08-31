@@ -109,8 +109,8 @@ class Voice(object):
         words_per_second_floor = 2.5
         minimum_safe_duration = float(word_count / words_per_second_floor)
         
-        if length < minimum_safe_duration:
-            length = minimum_safe_duration
+        #if length < minimum_safe_duration:
+        #    length = minimum_safe_duration
             
         # --- 🔧 FIX FOR THE HIDEAWAY BUFFER ---
         # Add a flat 1.5 seconds to account for "Plastic Waiter." being appended in the bash script

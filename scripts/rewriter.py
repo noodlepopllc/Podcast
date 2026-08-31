@@ -100,10 +100,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-I', '--input', type=str, help="Path to script")
     parser.add_argument('-O', '--output', type=str, help="Output file")
-    parser.add_argument('-S', '--soft', action='store_true', help='Subtler rewrite')
+    parser.add_argument('-P', '--persona', type=str, default='A news anchor for a night time television segment', help='persona of speaker')
     args = parser.parse_args()
     outputs = []
-    prompt_path = 'prompts/sentence_enhance_soft.txt' if args.soft else 'prompts/sentence_enhance.txt'
+    prompt_path = 'prompts/sentence_enhance_agnostic.txt'
     prompt = Path(prompt_path).read_text()
     for line in Path(args.input).read_text().split('\n'):
         segments = line.split(':')
@@ -112,7 +112,7 @@ def main():
         results = scan_script(sentence)
         for result in results:
             if result['needs_rewrite']:
-                template = prompt.format(sentence=result['sentence'], issues=result['issues'])
+                template = prompt.format(sentence=result['sentence'], issues=result['issues'], issues=args.persona)
                 new_sentences = llm_analyze_media('',prompt=template)['analysis']
                 for asentence in new_sentences.split('\n'):
                     new_complete = f'{who}: {asentence}'

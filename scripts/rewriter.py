@@ -116,6 +116,7 @@ def main():
                 new_sentences = llm_analyze_media('',prompt=template)['analysis']
                 for asentence in new_sentences.split('\n'):
                     new_complete = f'{who}: {asentence}'
+                    print(asentence)
                     print(new_complete)
                     outputs.append(new_complete)
             else:

@@ -97,9 +97,35 @@ class Voice(object):
         voice = self.config[key]['voice']
         text_path = path.replace('.wav','.txt')
         CloneVoice(text, voice, path, 15.0, lengthen=False, session=session)
-        length = round(librosa.get_duration(path=path),2)
-        Path(text_path).write_text(f'{math.ceil(length)}|{text}')
+        
+        # Grab the raw, high-precision float duration from librosa
+        length = round(librosa.get_duration(path=path), 2)
+        
+        # --- AUTOMATED DURATION FLOOR CHECKS ---
+        words = text.split()
+        word_count = len(words)
+        
+        # Enforce a safe maximum speed baseline
+        words_per_second_floor = 2.5
+        minimum_safe_duration = float(word_count / words_per_second_floor)
+        
+        if length < minimum_safe_duration:
+            length = minimum_safe_duration
+            
+        # --- 🔧 FIX FOR THE HIDEAWAY BUFFER ---
+        # Add a flat 1.5 seconds to account for "Plastic Waiter." being appended in the bash script
+        # This keeps the video model from compressing your actual sentence timeline!
+        length += 1.5
+        
+        # Hard round up to the next full second
+        length = float(math.ceil(length))
+        print(f"🎬 FINAL SYNCHRONIZED VIDEO DURATION (WITH BUFFER ACCOUTING): {length}s")
+        # ----------------------------------------
+        
+        Path(text_path).write_text(f'{int(length)}|{text}')
         return length
+
+
 
     def run(self, script):
         jsonpath = script.split('.')[-2] + '.json'

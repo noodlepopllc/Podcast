@@ -94,9 +94,9 @@ def stop_frame_from_sample(stop_sample, fps=24, sr=48000):
 
 def sample_end(stop_time, sr=48000, fps=24, start=True):
     if start:
-        return int(stop_time * sr) - ((sr // fps) * 3)
+        return int(stop_time * sr) - ((sr // fps) * 1)
     else:
-        return int(stop_time * sr) + ((sr // fps) * 8)
+        return int(stop_time * sr) + ((sr // fps) * 1)
 
 def trim_video_frames(frames_dir, stop_frame):
     frames_dir = Path(frames_dir)

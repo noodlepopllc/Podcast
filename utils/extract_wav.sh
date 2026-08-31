@@ -45,8 +45,24 @@ for ((i=0; i<num_files; i++)); do
     last=$(find "$INBOUND" -maxdepth 1 -type f -name "*.png" | sort | head -n 1)
 
     if [[ -n "$last" && -n "$first" ]]; then
-        ffmpeg -framerate 24 -loop 1 -i "$first" -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/first.mp4
-        ffmpeg -framerate 24 -loop 1 -i "$last"  -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/last.mp4
+        #ffmpeg -framerate 24 -loop 1 -i "$first" -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/first.mp4
+        #ffmpeg -framerate 24 -loop 1 -i "$last"  -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/last.mp4
+
+        ffmpeg -framerate 24 -loop 1 -i "$first" \
+            -f lavfi -i anullsrc=channel_layout=mono:sample_rate=48000 \
+            -shortest \
+            -t 0.5 \
+            -c:v libx264 -pix_fmt yuv420p \
+            -c:a aac -b:a 128k \
+            "$WORK/first.mp4"
+
+        ffmpeg -framerate 24 -loop 1 -i "$last" \
+            -f lavfi -i anullsrc=channel_layout=mono:sample_rate=48000 \
+            -shortest \
+            -t 0.5 \
+            -c:v libx264 -pix_fmt yuv420p \
+            -c:a aac -b:a 128k \
+            "$WORK/last.mp4"
 
         #ffmpeg -i $WORK/first.mp4 -i $WORK/last.mp4 \
         #    -filter_complex "xfade=transition=fade:duration=0.25:offset=0" \

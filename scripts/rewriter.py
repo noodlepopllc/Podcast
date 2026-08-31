@@ -88,7 +88,9 @@ def main():
         results = scan_script(sentence)
         for result in results:
             if result['needs_rewrite']:
-                template = prompt.format(sentence=result['sentence'], issues=result['issues'], persona=args.persona)
+                issue_string = ", ".join(result['issues'])
+                template = prompt.format(sentence=result['sentence'], issues=issue_string, persona=args.persona)
+
                 print(result['issues'])
                 new_sentences = llm_analyze_media('',prompt=template)['analysis']
                 for asentence in new_sentences.split('\n'):

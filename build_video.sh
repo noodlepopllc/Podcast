@@ -48,7 +48,7 @@ if [[ "$MODE" -eq 0 ]]; then
         uv run scripts/get_news.py -R "feeds/news.txt" -P "prompts/news.txt" -O current_newscast/worldnews.txt -L 
         uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/$prefix.txt
-        uv run scripts/rewriter.py -I current_newscast/$prefix.txt -O "current_newscast/${prefix}_rewritten.txt" 
+        uv run scripts/rewriter.py -I current_newscast/$prefix.txt -O "current_newscast/${prefix}_rewritten.txt"  -P "A news anchor for a night time television segment"
         #uv run scripts/combiner.py newscast_wavs newscast_wavs_out
     fi
 

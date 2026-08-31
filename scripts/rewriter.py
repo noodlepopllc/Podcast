@@ -71,10 +71,11 @@ def main():
         for result in results:
             if result['needs_rewrite']:
                 template = prompt.format(sentence=result['sentence'], issues=result['issues'], persona=args.persona)
+                print(result['issues'])
                 new_sentences = llm_analyze_media('',prompt=template)['analysis']
                 for asentence in new_sentences.split('\n'):
                     new_complete = f'{who}: {asentence}'
-                    print(asentence)
+                    print(sentence)
                     print(new_complete)
                     outputs.append(new_complete)
             else:

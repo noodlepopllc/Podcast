@@ -155,7 +155,7 @@ for wav in "$INPUT_DIR"/${prefix}*.wav; do
 
     uv run speech_to_video \
         -A "$REF" \
-        -T "$text Propeller triangle." \
+        -T "$text Plastic Waiter." \
         -P "$PROMPT" \
         -I "$ACTOR" \
         -D "$duration" \

@@ -64,15 +64,18 @@ def get_stop_time_debug(json_file):
     prev_end = None
 
     # Search backwards for "propeller"
+    # Search backwards for "banana" safely
     for i in range(len(all_words)-1, -1, -1):
         w = all_words[i]
-        if w['word'].strip().lower().startswith("propeller"):
-            print(f"\nFOUND PROPELLER at index {i}: {w}")
+        # Using startswith handles "banana", "banana.", or "banana," seamlessly
+        if w['word'].strip().lower().startswith("plastic"):
+            print(f"\nFOUND PLASTIC BUFFER TRIGGER at index {i}: {w}")
             if i > 0:
                 prev_end = all_words[i-1]['end']
-                print(f"PREV WORD at index {i-1}: {all_words[i-1]}")
+                print(f"PREV TRUE WORD at index {i-1}: {all_words[i-1]}")
             else:
-                print("NO PREV WORD (propeller is first)")
+                print("NO PREV WORD (plastic is first)")
+            
             stop_time = w['start']
             print(f"\nRETURNING stop_time={stop_time}, prev_end={prev_end}, isStop=True")
             return (stop_time, prev_end, True)

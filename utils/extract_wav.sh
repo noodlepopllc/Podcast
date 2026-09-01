@@ -44,14 +44,14 @@ for ((i=0; i<num_files; i++)); do
     first=$(find "$WORKING" -maxdepth 1 -type f -name "*.png" | sort | tail -n 1)
     last=$(find "$INBOUND" -maxdepth 1 -type f -name "*.png" | sort | head -n 1)
 
+    transition_duration=0.25
+
     if [[ -n "$last" && -n "$first" ]]; then
-        #ffmpeg -framerate 24 -loop 1 -i "$first" -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/first.mp4
-        #ffmpeg -framerate 24 -loop 1 -i "$last"  -t 0.5 -c:v libx264 -pix_fmt yuv420p $WORK/last.mp4
 
         ffmpeg -framerate 24 -loop 1 -i "$first" \
             -f lavfi -i anullsrc=channel_layout=mono:sample_rate=48000 \
             -shortest \
-            -t 0.5 \
+            -t $transition_duration \
             -c:v libx264 -pix_fmt yuv420p \
             -c:a aac -b:a 128k \
             "$WORK/first.mp4"
@@ -59,19 +59,14 @@ for ((i=0; i<num_files; i++)); do
         ffmpeg -framerate 24 -loop 1 -i "$last" \
             -f lavfi -i anullsrc=channel_layout=mono:sample_rate=48000 \
             -shortest \
-            -t 0.5 \
+            -t $transition_duration  \
             -c:v libx264 -pix_fmt yuv420p \
             -c:a aac -b:a 128k \
             "$WORK/last.mp4"
 
-        #ffmpeg -i $WORK/first.mp4 -i $WORK/last.mp4 \
-        #    -filter_complex "xfade=transition=fade:duration=0.25:offset=0" \
-        #    -c:v libx264 -pix_fmt yuv420p "$transition"
-
         ffmpeg -i $WORK/first.mp4 -i $WORK/last.mp4 \
-            -filter_complex "[0]format=yuv420p, gblur=sigma=2[fg]; [1]format=yuv420p, gblur=sigma=2[bg]; [fg][bg]xfade=transition=fade:duration=0.40:offset=0" \
+            -filter_complex "[0]format=yuv420p, gblur=sigma=1[fg]; [1]format=yuv420p, gblur=sigma=1[bg]; [fg][bg]xfade=transition=fade:duration=$transition_duration:offset=0" \
             -c:v libx264 -pix_fmt yuv420p "$transition"
-
 
         rm $WORK/first.mp4
         rm $WORK/last.mp4

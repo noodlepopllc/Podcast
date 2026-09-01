@@ -11,15 +11,40 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 
-def find_first_sound(audio, threshold=0.01):
-    # absolute amplitude
+def find_first_sound(audio, sr=48000, first_word="", whisper_start_time=0.0):
+    # Default settings for robust, voiced starts (Vowels, B, M, D, G, etc.)
+    threshold = 0.015
+    window_ms = 15
+    
+    # Soft, unvoiced consonants that need a lower threshold to prevent clipping
+    soft_consonants = ("s", "f", "p", "t", "c", "k", "h", "sh", "th")
+    if first_word.startswith(soft_consonants):
+        threshold = 0.006  # Looser threshold for soft sounds
+        window_ms = 8      # Snappier window
+
+    # Convert Whisper's start time to an audio sample index
+    whisper_sample = int(whisper_start_time * sr)
+    
+    # Look back 150ms before Whisper's timestamp to catch early consonant data
+    lookback_samples = int(0.150 * sr)
+    start_search_idx = max(0, whisper_sample - lookback_samples)
+    
     abs_audio = np.abs(audio)
-
-    # find first index above threshold
-    idx = np.argmax(abs_audio > threshold)
-
-    # if no sound found, return 0
-    return idx if abs_audio[idx] > threshold else 0
+    win_size = int((window_ms / 1000) * sr)
+    
+    # Scan forward from our lookback anchor
+    for idx in range(start_search_idx, len(abs_audio) - win_size, 48):
+        window = abs_audio[idx : idx + win_size]
+        if np.max(window) > threshold:
+            return idx
+            
+    # Fallback to a clean raw scan if anchor math misses
+    for idx in range(0, len(abs_audio) - win_size, 48):
+        window = abs_audio[idx : idx + win_size]
+        if np.max(window) > threshold:
+            return idx
+            
+    return 0
 
 def trim_video_frames_front(frames_dir, start_frame):
     frames_dir = Path(frames_dir)
@@ -42,6 +67,17 @@ def trim_video_frames_back(frames_dir, stop_frame):
 
 from pathlib import Path
 import json
+
+def get_first_word_info(json_file):
+    try:
+        timings = json.loads(Path(json_file).read_text())
+        for seg in timings.get('segments', []):
+            for w in seg.get('words', []):
+                # Return the very first word found in the clip
+                return w['word'].strip().lower(), float(w['start'])
+    except Exception:
+        pass
+    return "", 0.0
 
 def get_stop_time_debug(json_file):
     timings = json.loads(Path(json_file).read_text())
@@ -161,7 +197,9 @@ def trim_wav(json_file, wav_file, output):
     # ----------------------------------------
     # 6. NOW detect first sound (safe AFTER end trim)
     # ----------------------------------------
-    start_sample = find_first_sound(audio)
+    first_word, whisper_start = get_first_word_info(json_file)
+    
+    start_sample = find_first_sound(audio, sr=sr, first_word=first_word, whisper_start_time=whisper_start)
     start_frame  = stop_frame_from_sample(start_sample)
 
     # ----------------------------------------

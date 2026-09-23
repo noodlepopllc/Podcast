@@ -46,7 +46,7 @@ if [[ "$MODE" -eq 0 ]]; then
         #rm -f newscast_wavs_out/*
         mkdir -p current_newscast
         uv run scripts/get_news.py -R "feeds/news.txt" -P "prompts/news.txt" -O current_newscast/worldnews.txt -L 
-        uv run llm -S current_newscast/worldnews.txt -M 32786 -P " " -O current_newscast/worldnews_script.txt
+        uv run llm -S current_newscast/worldnews.txt -T 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/$prefix.txt
         uv run scripts/rewriter.py -I current_newscast/$prefix.txt -O "current_newscast/${prefix}_rewritten.txt"  -P "A news anchor for a night time television segment"
         #uv run scripts/combiner.py newscast_wavs newscast_wavs_out
@@ -81,7 +81,7 @@ if [[ "$MODE" -eq 1 ]]; then
         #rm -f podcast_wavs_out/*
         mkdir -p current_podcast
         uv run scripts/get_news.py -R "feeds/gaming.txt" -P "prompts/gamer.txt" -O current_podcast/gamingnews.txt -L -T 1 
-        uv run llm -S current_podcast/gamingnews.txt -M 32786 -P " " -O current_podcast/gamingnews_script.txt
+        uv run llm -S current_podcast/gamingnews.txt -T 32786 -P " " -O current_podcast/gamingnews_script.txt
         uv run scripts/to_script.py -I current_podcast/gamingnews_script.txt -S Gamer -O current_podcast/$prefix.txt
         uv run scripts/rewriter.py -I current_podcast/$prefix.txt -O "current_podcast/${prefix}_rewritten.txt"  -P "A female game podcaster with high energy"
         
@@ -117,7 +117,7 @@ if [[ "$MODE" -eq 2 ]]; then
         #rm -f educast_wavs_out/*
         mkdir -p current_educast
         uv run scripts/get_news.py -R "feeds/science.txt" -P "prompts/science.txt" -O current_educast/sciencenews.txt -L 
-        uv run llm -S current_educast/sciencenews.txt -M 32786 -P " " -O current_educast/sciencenews_script.txt
+        uv run llm -S current_educast/sciencenews.txt -T 32786 -P " " -O current_educast/sciencenews_script.txt
         uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/$prefix.txt
         uv run scripts/rewriter.py -I current_educast/$prefix.txt -O "current_educast/${prefix}_rewritten.txt"  -P "A female data scientist with a passion for science"
         #uv run scripts/combiner.py educast_wavs educast_wavs_out

@@ -123,7 +123,7 @@ if [[ "$MODE" -eq 2 ]]; then
         #uv run scripts/combiner.py educast_wavs educast_wavs_out
     fi
 
-    uv run scripts/script_reader.py -s -i "current_educast/$prefix.tx" -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
+    uv run scripts/script_reader.py -s -i "current_educast/$prefix.txt" -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
 
     INPUT_DIR="educast_wavs"
     ACTOR="$SCIENTIST"

@@ -48,11 +48,11 @@ if [[ "$MODE" -eq 0 ]]; then
         uv run scripts/get_news.py -R "feeds/news.txt" -P "prompts/news.txt" -O current_newscast/worldnews.txt -L 
         uv run llm -S current_newscast/worldnews.txt -T 32786 -P " " -O current_newscast/worldnews_script.txt
         uv run scripts/to_script.py -I current_newscast/worldnews_script.txt -S Anchor -O current_newscast/$prefix.txt
-        uv run scripts/rewriter.py -I current_newscast/$prefix.txt -O "current_newscast/${prefix}_rewritten.txt"  -P "A news anchor for a night time television segment"
+        #uv run scripts/rewriter.py -I current_newscast/$prefix.txt -O "current_newscast/${prefix}_rewritten.txt"  -P "A news anchor for a night time television segment"
         #uv run scripts/combiner.py newscast_wavs newscast_wavs_out
     fi
 
-    uv run scripts/script_reader.py -s -i "current_newscast/${prefix}_rewritten.txt"  -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
+    uv run scripts/script_reader.py -s -i "current_newscast/$prefix.txt"  -r $ANCHOR_VOICE -n Anchor -o newscast_wavs
 
 
     INPUT_DIR="newscast_wavs"
@@ -83,12 +83,12 @@ if [[ "$MODE" -eq 1 ]]; then
         uv run scripts/get_news.py -R "feeds/gaming.txt" -P "prompts/gamer.txt" -O current_podcast/gamingnews.txt -L -T 1 
         uv run llm -S current_podcast/gamingnews.txt -T 32786 -P " " -O current_podcast/gamingnews_script.txt
         uv run scripts/to_script.py -I current_podcast/gamingnews_script.txt -S Gamer -O current_podcast/$prefix.txt
-        uv run scripts/rewriter.py -I current_podcast/$prefix.txt -O "current_podcast/${prefix}_rewritten.txt"  -P "A female game podcaster with high energy"
+        #uv run scripts/rewriter.py -I current_podcast/$prefix.txt -O "current_podcast/${prefix}_rewritten.txt"  -P "A female game podcaster with high energy"
         
         #uv run scripts/combiner.py podcast_wavs podcast_wavs_out
     fi
 
-    uv run scripts/script_reader.py -s -i "current_podcast/${prefix}_rewritten.txt"  -r $GAMER_VOICE -n Gamer -o podcast_wavs
+    uv run scripts/script_reader.py -s -i "current_podcast/$prefix.txt"  -r $GAMER_VOICE -n Gamer -o podcast_wavs
 
     INPUT_DIR="podcast_wavs"
     ACTOR="$GAMER"
@@ -119,11 +119,11 @@ if [[ "$MODE" -eq 2 ]]; then
         uv run scripts/get_news.py -R "feeds/science.txt" -P "prompts/science.txt" -O current_educast/sciencenews.txt -L 
         uv run llm -S current_educast/sciencenews.txt -T 32786 -P " " -O current_educast/sciencenews_script.txt
         uv run scripts/to_script.py -I current_educast/sciencenews_script.txt -S Scientist -O current_educast/$prefix.txt
-        uv run scripts/rewriter.py -I current_educast/$prefix.txt -O "current_educast/${prefix}_rewritten.txt"  -P "A female data scientist with a passion for science"
+        #uv run scripts/rewriter.py -I current_educast/$prefix.txt -O "current_educast/${prefix}_rewritten.txt"  -P "A female data scientist with a passion for science"
         #uv run scripts/combiner.py educast_wavs educast_wavs_out
     fi
 
-    uv run scripts/script_reader.py -s -i "current_educast/${prefix}_rewritten.txt" -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
+    uv run scripts/script_reader.py -s -i "current_educast/$prefix.tx" -r $SCIENTIST_VOICE -n Scientist -o educast_wavs
 
     INPUT_DIR="educast_wavs"
     ACTOR="$SCIENTIST"

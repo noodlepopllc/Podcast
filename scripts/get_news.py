@@ -160,8 +160,8 @@ def main():
     json_context = json.dumps(limited, indent=2)
 
     from pathlib import Path
-    template = Path(prompt).read_text().format(json_context=json_context)
-    Path(args.output).write_text(template)
+    template = Path(prompt).read_text(encoding='utf-8').format(json_context=json_context)
+    Path(args.output).write_text(template, encoding='utf-8')
     print(template[:125])
 
 if __name__ == '__main__':
